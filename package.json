@@ -1,0 +1,17 @@
+{
+  "name": "malbot",
+  "version": "1.0.0",
+  "description": "A Discord bot written in JavaScript that requests information from MyAnimeList using the MAL API v2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^14.16.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.11.1"
+  }
+}
