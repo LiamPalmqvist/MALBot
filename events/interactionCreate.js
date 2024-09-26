@@ -15,7 +15,9 @@ module.exports = {
 		try {
 			await command.execute(interaction);
 			// get the options from the command if they exist
-			console.log(interaction.options.getString("input"));
+			if (interaction.options.getString("input")) {
+				console.log(interaction.options.getString("input"));
+			}
             console.log(interaction.commandName + ' command executed');
 		} catch (error) {
 			console.error(error);
