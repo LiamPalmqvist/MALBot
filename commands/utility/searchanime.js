@@ -1,4 +1,4 @@
-const {SlashCommandBuilder} = require('@discordjs/builders');
+const {SlashCommandBuilder, StringSelectMenuBuilder, ActionRowBuilder, ButtonBuilder} = require('@discordjs/builders');
 const { MAL_KEY } = require('../../config.json');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
@@ -47,11 +47,55 @@ module.exports = {
         let message = ""
         if (data.data.length > 0) {
             for (let i = 0; i < data.data.length; i++) {
-                message+=(`${data.data[i].node.title}\n`);
+                message+=(`${i}. ${data.data[i].node.title}\n`);
             }
         }
-        await interaction.reply(`${message}`);
 
+        /*
+        const arrowLeft = new ButtonBuilder()
+        .setCustomId("left")
+        .setLabel("⬅️")
+        .setStyle("Primary")
+
+        const arrowRight = new ButtonBuilder()
+        .setCustomId("right")
+        .setLabel("➡️")
+        .setStyle("Primary")
+        */
+        const select = new StringSelectMenuBuilder()
+        .setCustomId('select')
+        .addOptions(
+            data.data.map((item, index) => {
+                return {
+                    label: item.node.title,
+                    value: index.toString()
+                }
+            })
+        )
+
+        const row = new ActionRowBuilder()
+            //.addComponents(arrowLeft)
+            .addComponents(select)
+            //.addComponents(arrowRight);
+
+        const response = await interaction.reply({
+            content: `${message}`, 
+            components: [row],
+        });
+
+        // This filter will ensure that the collector will only listen for interactions from the user who initiated the command
+        const collectorFilter = i => i.user.id === interaction.user.id;
+
+        try {
+            const confirmation = await response.awaitMessageComponent({ filter: collectorFilter, time: 60_000 });
+            console.log(confirmation.values[0]);
+            const entry = await grabEntry(data.data[confirmation.values[0]].node.id, `${interaction.options.getSubcommand()}`);
+            console.log(entry);
+            await interaction.editReply({ content: `Title: ${entry.title}\nRank: ${entry.rank}\Score: ${entry.mean}\nAlternative Title: ${entry.alternative_title}`, components: [] });
+        } catch(e) {
+            console.error(e);
+            await interaction.editReply({ content: 'No selection was made within a minute.', components: [] });
+        }
     }
 };
 
@@ -63,6 +107,29 @@ async function search(searchParams, searchAmount, animeOrManga) {
     console.log("https://api.myanimelist.net/v2/" + animeOrManga + params);
     return new Promise((resolve, reject) => {
         fetch('https://api.myanimelist.net/v2/' + animeOrManga + params, {
+            method: 'GET',
+            headers: {
+                "X-MAL-CLIENT-ID": MAL_KEY,
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            resolve(data);
+        })
+        .catch(error => {
+            console.error(error);
+            reject(error);
+        });
+    })
+};
+
+async function grabEntry(titleID, animeOrManga) {
+    const params = new URLSearchParams();
+    params.append('fields', 'rank,mean,alternative_title');
+    console.log(`https://api.myanimelist.net/v2/${animeOrManga}/${titleID}`);
+    return new Promise((resolve, reject) => {
+        fetch(`https://api.myanimelist.net/v2/${animeOrManga}/${titleID}?${params}`, {
             method: 'GET',
             headers: {
                 "X-MAL-CLIENT-ID": MAL_KEY,
