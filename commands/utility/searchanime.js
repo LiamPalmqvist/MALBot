@@ -17,7 +17,7 @@ module.exports = {
                 .setMaxValue(10)
                 .setMinValue(1)
         )
-        .setDescription('Replies with a fetchRequest!'),
+        .setDescription('Search for an anime on MyAnimeList'),
     async execute(interaction) {
         const data = await requestAnime(interaction.options.getString("anime"), interaction.options.getInteger("amount"));
         let message = ""
