@@ -4,22 +4,46 @@ const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('searchanime')
-        .addStringOption(option => 
-            option.setName('anime')
-                .setDescription('The anime title to search for')
-                .setRequired(true)
+        .setName('search')
+        .setDescription('Search for an anime or manga')
+        .addSubcommand(subcommand =>
+            subcommand.setName('anime')
+            .setDescription('Search for an anime')
+            .addStringOption(option => 
+                option.setName('title')
+                    .setDescription('The anime title to search for')
+                    .setRequired(true)
+            )
+            .addIntegerOption(option =>
+                option.setName('amount')
+                    .setDescription('The amount of results to return')
+                    .setRequired(true)
+                    .setMaxValue(10)
+                    .setMinValue(1)
+            )
         )
-        .addIntegerOption(option =>
-            option.setName('amount')
-                .setDescription('The amount of results to return')
-                .setRequired(true)
-                .setMaxValue(10)
-                .setMinValue(1)
-        )
-        .setDescription('Search for an anime on MyAnimeList'),
+        .addSubcommand(subcommand =>
+            subcommand.setName('manga')
+            .setDescription('Search for a manga')
+            .addStringOption(option => 
+                option.setName('title')
+                    .setDescription('The manga title to search for')
+                    .setRequired(true)
+            )
+            .addIntegerOption(option =>
+                option.setName('amount')
+                    .setDescription('The amount of results to return')
+                    .setRequired(true)
+                    .setMaxValue(10)
+                    .setMinValue(1)
+            )
+        ),
     async execute(interaction) {
-        const data = await requestAnime(interaction.options.getString("anime"), interaction.options.getInteger("amount"));
+        
+        console.log(interaction.options.getString("title"));
+        
+        const data = await search(interaction.options.getString("title"), interaction.options.getInteger("amount"), `${interaction.options.getSubcommand()}?`);
+        console.log(data);
         let message = ""
         if (data.data.length > 0) {
             for (let i = 0; i < data.data.length; i++) {
@@ -27,17 +51,18 @@ module.exports = {
             }
         }
         await interaction.reply(`${message}`);
+
     }
 };
 
-async function requestAnime(searchParams, searchAmount) {
+async function search(searchParams, searchAmount, animeOrManga) {
     const params = new URLSearchParams();
     params.append('q', searchParams);
     params.append('limit', searchAmount);
     params.append('fields', 'rank,mean,alternative_title');
-    console.log(`https://api.myanimelist.net/v2/anime?` + params)
+    console.log("https://api.myanimelist.net/v2/" + animeOrManga + params);
     return new Promise((resolve, reject) => {
-        fetch(`https://api.myanimelist.net/v2/anime?` + params, {
+        fetch('https://api.myanimelist.net/v2/' + animeOrManga + params, {
             method: 'GET',
             headers: {
                 "X-MAL-CLIENT-ID": MAL_KEY,
@@ -53,18 +78,4 @@ async function requestAnime(searchParams, searchAmount) {
             reject(error);
         });
     })
-};
-
-
-function base64urlencode(a) {
-    var str = "";
-    var bytes = new Uint8Array(a);
-    var len = bytes.byteLength;
-    for (var i = 0; i < len; i++) {
-        str += String.fromCharCode(bytes[i]);
-    }
-    return btoa(str)
-        .replace(/\+/g, "-")
-        .replace(/\//g, "_")
-        .replace(/=+$/, "");
 };
