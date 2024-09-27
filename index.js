@@ -58,4 +58,5 @@ for (const file of eventsFiles) {
 
 
 // login to Discord with the app's token
+console.log(token);
 client.login(token);
