@@ -53,9 +53,11 @@ async function generateCodeVerifierAndChallenge() {
 }
 
 // Example usage
+/*
 generateCodeVerifierAndChallenge().then(({ codeVerifier, codeChallenge }) => {
     // You can now use the codeVerifier and codeChallenge in your OAuth 2.0 PKCE flow
     console.log("Generated Code Verifier and Code Challenge:");
     console.log("Code Verifier:", codeVerifier);
     console.log("Code Challenge:", codeChallenge);
 });
+*/

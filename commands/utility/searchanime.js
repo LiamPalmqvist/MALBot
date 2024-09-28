@@ -116,7 +116,7 @@ module.exports = {
                     { name: 'Start Date', value: `${entry.start_date===undefined ? "TDA" : entry.start_date}`, inline: true }
                 )
                 .setTimestamp()
-                .setFooter({ text: 'Powered by MyAnimeList', iconURL: 'https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png'});
+                .setFooter({ text: 'Powered by MyAnimeList API v2.0', iconURL: 'https://cdn.myanimelist.net/img/sp/icon/apple-touch-icon-256.png'});
 
             if (entry.end_date !== undefined) {   
                 switch (interaction.options.getSubcommand()) {
@@ -204,7 +204,7 @@ async function grabEntry(titleID, animeOrManga) {
     // Add the fields you want to retrieve from the API
     // Unfortunatly, the API does not allow you to retrieve all fields at once
     // So this needs to be as long as it currently is :(
-    params.append('fields', 'id,title,main_picture,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics');
+    params.append('fields', 'id,title,main_picture,num_chapters,alternative_titles,start_date,end_date,synopsis,mean,rank,popularity,num_list_users,num_scoring_users,nsfw,created_at,updated_at,media_type,status,genres,my_list_status,num_episodes,start_season,broadcast,source,average_episode_duration,rating,pictures,background,related_anime,related_manga,recommendations,studios,statistics');
     console.log(`https://api.myanimelist.net/v2/${animeOrManga}/${titleID}`);
     return new Promise((resolve, reject) => {
         fetch(`https://api.myanimelist.net/v2/${animeOrManga}/${titleID}?${params}`, {

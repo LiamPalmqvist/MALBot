@@ -1,7 +1,7 @@
 // Require the necessary modules
 const fs = require('node:fs'); // reads the files
 const path = require('node:path'); // joins the paths in the file system
-const { Client, Collection, GatewayIntentBits } = require('discord.js'); // obvious
+const { Client, Collection, GatewayIntentBits, ActivityType } = require('discord.js'); // obvious
 const { token } = require('./config.json'); // the token and other sensitive data
 
 // create a new Discord client
@@ -56,7 +56,5 @@ for (const file of eventsFiles) {
 
 // ================== End Event Handler ==================
 
-
 // login to Discord with the app's token
-console.log(token);
 client.login(token);
